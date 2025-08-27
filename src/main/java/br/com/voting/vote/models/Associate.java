@@ -1,23 +1,39 @@
 package br.com.voting.vote.models;
 
-
 import jakarta.persistence.*;
 
-@Entity
-@Table(name = "associate")
-public class Associate {
+@MappedSuperclass
+public abstract class Associate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    protected Long id;
 
     @Column(name = "name")
-    private String name;
+    protected String name;
 
     @Column(name = "cpf")
-    private String cpf;
+    protected String cpf;
 
     public Associate() {
+    }
+
+    public Associate(String name, String cpf) {
+        this.name = name;
+        this.cpf = cpf;
+    }
+
+    public abstract boolean canVoteYes();
+    public abstract boolean canVoteNo();
+    public abstract boolean canStartSession();
+    public abstract String getAssociateType();
+
+    public boolean canParticipate() {
+        return cpf != null && !cpf.isEmpty();
+    }
+
+    public boolean hasVotingPermission() {
+        return canVoteYes() || canVoteNo();
     }
 
     public Long getId() {
@@ -42,5 +58,15 @@ public class Associate {
 
     public void setCpf(String cpf) {
         this.cpf = cpf;
+    }
+
+    @Override
+    public String toString() {
+        return "Associate{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", cpf='" + cpf + '\'' +
+                ", type=" + getAssociateType() +
+                '}';
     }
 }
