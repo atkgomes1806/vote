@@ -5,7 +5,9 @@ public class AssociateDTO {
     private String id;
     private String name;
     private String cpf;
+    private String type;
 
+    // Getters e Setters existentes
     public String getId() {
         return id;
     }
@@ -18,7 +20,7 @@ public class AssociateDTO {
         return name;
     }
 
-    public void setNome(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -28,5 +30,13 @@ public class AssociateDTO {
 
     public void setCpf(String cpf) {
         this.cpf = cpf;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
