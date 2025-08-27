@@ -2,7 +2,7 @@ package br.com.voting.vote.services.impl;
 
 import br.com.voting.vote.dtos.AssociateDTO;
 import br.com.voting.vote.exception.NotFoundException;
-import br.com.voting.vote.models.Associate;
+import br.com.voting.vote.models.*;
 import br.com.voting.vote.repositories.AssociateRepository;
 import br.com.voting.vote.services.AssociateService;
 import jakarta.transaction.Transactional;
@@ -22,10 +22,8 @@ public class AssociateServiceImpl implements AssociateService {
     @Transactional
     @Override
     public void createAssociate(AssociateDTO associateDTO) {
-        Associate associate = new Associate();
-        associate.setName(associateDTO.getName());
-        associate.setCpf(associateDTO.getCpf());
 
+        Associate associate = createAssociateByType(associateDTO);
         repository.save(associate);
     }
 
@@ -36,27 +34,55 @@ public class AssociateServiceImpl implements AssociateService {
 
     @Override
     public Associate findById(String id) {
-        return repository.findById(Long.parseLong(id)).orElseThrow(() ->
-                new NotFoundException("Associado não encontrado"));
+        return repository.findById(Long.parseLong(id))
+                .orElseThrow(() -> new NotFoundException("Associado não encontrado"));
     }
 
     @Override
     public void deleteAssociate(String id) {
         Associate associate = findById(id);
-
-        if (associate != null) {
-            repository.delete(associate);
-        }
+        repository.delete(associate);
     }
 
     @Transactional
     @Override
     public void updateAssociate(AssociateDTO associateDTO, String id) {
         Associate associate = findById(id);
-        if (associate != null) {
-            associate.setCpf(associateDTO.getCpf());
-            associate.setName(associateDTO.getName());
-            repository.save(associate);
-        }
+        
+        // Atualiza os campos comuns
+        associate.setName(associateDTO.getName());
+        associate.setCpf(associateDTO.getCpf());
+        
+        repository.save(associate);
+    }
+
+    // IMPLEMENTAÇÃO DOS NOVOS MÉTODOS
+    @Override
+    public boolean canAssociateVote(String associateId) {
+        Associate associate = findById(associateId);
+        return associate.hasVotingPermission();
+    }
+
+    @Override
+    public boolean canAssociateStartSession(String associateId) {
+        Associate associate = findById(associateId);
+        return associate.canStartSession();
+    }
+
+    @Override
+    public String getAssociateType(String associateId) {
+        Associate associate = findById(associateId);
+        return associate.getAssociateType();
+    }
+
+    private Associate createAssociateByType(AssociateDTO associateDTO) {
+        String type = associateDTO.getType() != null ? 
+                     associateDTO.getType().toUpperCase() : "REGULAR";
+
+        return switch (type) {
+            case "ADMIN" -> new AdminAssociate(associateDTO.getName(), associateDTO.getCpf());
+            case "OBSERVER" -> new ObserverAssociate(associateDTO.getName(), associateDTO.getCpf());
+            default -> new RegularAssociate(associateDTO.getName(), associateDTO.getCpf());
+        };
     }
 }
