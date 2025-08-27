@@ -46,5 +46,22 @@ public class AssociateController {
         return ResponseEntity.noContent().build();
     }
 
+    // NOVOS ENDPOINTS
+    @GetMapping(path = "{id}/can-vote")
+    public ResponseEntity<Boolean> canAssociateVote(@PathVariable("id") String id) {
+        boolean canVote = associateService.canAssociateVote(id);
+        return ResponseEntity.ok(canVote);
+    }
 
+    @GetMapping(path = "{id}/can-start-session")
+    public ResponseEntity<Boolean> canAssociateStartSession(@PathVariable("id") String id) {
+        boolean canStart = associateService.canAssociateStartSession(id);
+        return ResponseEntity.ok(canStart);
+    }
+
+    @GetMapping(path = "{id}/type")
+    public ResponseEntity<String> getAssociateType(@PathVariable("id") String id) {
+        String type = associateService.getAssociateType(id);
+        return ResponseEntity.ok(type);
+    }
 }
