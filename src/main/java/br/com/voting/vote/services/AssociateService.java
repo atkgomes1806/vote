@@ -15,4 +15,9 @@ public interface AssociateService {
     void deleteAssociate(String id);
 
     void updateAssociate(AssociateDTO associateDTO, String id);
+    
+    // NOVOS MÉTODOS
+    boolean canAssociateVote(String associateId);
+    boolean canAssociateStartSession(String associateId);
+    String getAssociateType(String associateId);
 }
